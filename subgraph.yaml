@@ -1,5 +1,5 @@
 specVersion: 0.0.4
-description: CAIP22
+description: CAIP22 - NFT ERC721 subgraph with CAIP22 identifier
 repository: https://github.com/zapaz/caip22-subgraph
 schema:
   file: ./schema.graphql

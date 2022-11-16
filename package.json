@@ -1,5 +1,6 @@
 {
   "name": "caip22",
+  "version": "0.0.9",
   "license": "UNLICENSED",
   "scripts": {
     "which": "which graph",

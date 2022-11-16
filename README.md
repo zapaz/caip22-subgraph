@@ -1,10 +1,12 @@
 # NFT CAIP22 subgraph
 
-NFT ERC721 subgraph with CAIP22 id
+NFT ERC721 subgraph with CAIP22 identifier
 
-- id : NFT ref conformant to CAIP22
+- id : NFT identifier conformant to CAIP22
+- chainId : blockchain identifier
+- address : address of the NFT smartcontract
+- tokenID : NFT identifier inside smartcontract
 - tokenURI : uri containing json NFT metadata
-- collection : address of the NFT smartcontract
 - owner : last owner of this NFT
 
 https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-22.md
@@ -12,7 +14,7 @@ https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-22.md
 Available on Goerli testnet
 
 Playground here :
-https://api.studio.thegraph.com/query/457/caip22/v0.0.6
+https://api.studio.thegraph.com/query/457/caip22/v0.0.9
 
 example query :
 

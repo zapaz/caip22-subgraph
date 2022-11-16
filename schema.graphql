@@ -1,6 +1,8 @@
 type Token @entity {
   id: ID!
-  tokenURI: String!
+  chainId: BigInt!
   address: String!
+  tokenID: BigInt!
+  tokenURI: String!
   owner: String!
 }

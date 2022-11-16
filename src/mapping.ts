@@ -30,7 +30,9 @@ function eventId(event: Transfer): string {
 function mintEvent(event: Transfer): void {
   let eip721Token = new Token(eventId(event));
 
+  eip721Token.chainId = BigInt.fromI32(CHAIN_ID);
   eip721Token.address = event.address.toHex();
+  eip721Token.tokenID = event.params.tokenId;
   eip721Token.owner = event.params.to.toHex();
 
   let metadataURItried = ERC721.bind(event.address).try_tokenURI(event.params.tokenId);
