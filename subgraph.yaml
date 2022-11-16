@@ -1,6 +1,6 @@
 specVersion: 0.0.4
 description: CAIP22
-repository: https://github.com/zapaz/caip22
+repository: https://github.com/zapaz/caip22-subgraph
 schema:
   file: ./schema.graphql
 dataSources:

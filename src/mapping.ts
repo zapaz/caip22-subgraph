@@ -30,6 +30,9 @@ function eventId(event: Transfer): string {
 function mintEvent(event: Transfer): void {
   let eip721Token = new Token(eventId(event));
 
+  eip721Token.address = event.address.toHex();
+  eip721Token.owner = event.params.to.toHex();
+
   let metadataURItried = ERC721.bind(event.address).try_tokenURI(event.params.tokenId);
   eip721Token.tokenURI = metadataURItried.reverted ? "" : normalize(metadataURItried.value);
 
@@ -48,9 +51,10 @@ function transferEvent(event: Transfer): void {
 
       if (metadataURInew != metadataURIprevious) {
         eip721Token.tokenURI = metadataURInew;
-        eip721Token.save();
       }
     }
+    eip721Token.owner = event.params.to.toHex();
+    eip721Token.save();
   }
 }
 

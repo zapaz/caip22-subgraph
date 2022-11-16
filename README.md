@@ -1,9 +1,13 @@
 # NFT CAIP22 subgraph
 
-NFT ERC721 subgraph with two fields only :
+NFT ERC721 subgraph with CAIP22 id
 
-- id as CAIP22 NFT ref
-- tokenURI
+- id : NFT ref conformant to CAIP22
+- tokenURI : uri containing json NFT metadata
+- collection : address of the NFT smartcontract
+- owner : last owner of this NFT
+
+https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-22.md
 
 Available on Goerli testnet
 
