@@ -1,101 +1,68 @@
-import { BigInt } from "@graphprotocol/graph-ts"
-import {
-  OpenNFTs,
-  Approval,
-  ApprovalForAll,
-  OwnershipTransferred,
-  Pay,
-  SetDefaultRoyalty,
-  SetMintPrice,
-  SetPaused,
-  SetTokenPrice,
-  SetTokenRoyalty,
-  Transfer
-} from "../generated/OpenNFTs/OpenNFTs"
-import { ExampleEntity } from "../generated/schema"
+import { BigInt, store } from '@graphprotocol/graph-ts';
+import { Transfer, ERC721 } from '../generated/ERC721/ERC721';
+import { Token } from '../generated/schema';
 
-export function handleApproval(event: Approval): void {
-  // Entities can be loaded from the store using a string ID; this ID
-  // needs to be unique across all entities of the same type
-  let entity = ExampleEntity.load(event.transaction.from.toHex())
+let ZERO_ADDRESS_STRING = '0x0000000000000000000000000000000000000000';
 
-  // Entities only exist after they have been saved to the store;
-  // `null` checks allow to create entities on demand
-  if (!entity) {
-    entity = new ExampleEntity(event.transaction.from.toHex())
-
-    // Entity fields can be set using simple assignments
-    entity.count = BigInt.fromI32(0)
-  }
-
-  // BigInt and BigDecimal math are supported
-  entity.count = entity.count + BigInt.fromI32(1)
-
-  // Entity fields can be set based on event parameters
-  entity.owner = event.params.owner
-  entity.approved = event.params.approved
-
-  // Entities can be written to the store with `.save()`
-  entity.save()
-
-  // Note: If a handler doesn't require existing field values, it is faster
-  // _not_ to load the entity from the store. Instead, create it fresh with
-  // `new Entity(...)`, set the fields that should be updated and save the
-  // entity back to the store. Fields that were not set or unset remain
-  // unchanged, allowing for partial updates to be applied.
-
-  // It is also possible to access smart contracts from mappings. For
-  // example, the contract that has emitted the event can be connected to
-  // with:
-  //
-  // let contract = Contract.bind(event.address)
-  //
-  // The following functions can then be called on this contract to access
-  // state variables and other data:
-  //
-  // - contract.balanceOf(...)
-  // - contract.getApproved(...)
-  // - contract.getDefaultRoyalty(...)
-  // - contract.getMintPrice(...)
-  // - contract.getTokenPrice(...)
-  // - contract.getTokenRoyalty(...)
-  // - contract.initialized(...)
-  // - contract.isApprovedForAll(...)
-  // - contract.minimal(...)
-  // - contract.mint(...)
-  // - contract.mint(...)
-  // - contract.name(...)
-  // - contract.open(...)
-  // - contract.owner(...)
-  // - contract.ownerOf(...)
-  // - contract.parent(...)
-  // - contract.paused(...)
-  // - contract.royaltyInfo(...)
-  // - contract.supportsInterface(...)
-  // - contract.symbol(...)
-  // - contract.template(...)
-  // - contract.tokenByIndex(...)
-  // - contract.tokenIdNext(...)
-  // - contract.tokenOfOwnerByIndex(...)
-  // - contract.tokenURI(...)
-  // - contract.totalSupply(...)
-  // - contract.version(...)
+function setCharAt(str: string, index: i32, char: string): string {
+  if (index > str.length - 1) return str;
+  return str.substr(0, index) + char + str.substr(index + 1);
 }
 
-export function handleApprovalForAll(event: ApprovalForAll): void {}
+function normalize(strValue: string): string {
+  if (strValue.length === 1 && strValue.charCodeAt(0) === 0) {
+    return "";
+  } else {
+    for (let i = 0; i < strValue.length; i++) {
+      if (strValue.charCodeAt(i) === 0) {
+        strValue = setCharAt(strValue, i, '\ufffd'); // graph-node db does not support string with '\u0000'
+      }
+    }
+    return strValue;
+  }
+}
 
-export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
+export function handleTransfer(event: Transfer): void {
+  const chainId = 5;
+  let tokenId = event.params.tokenId;
 
-export function handlePay(event: Pay): void {}
+  let id = `eip155:${chainId}/erc721:${event.address.toHex()}/${tokenId.toString()}`;
 
-export function handleSetDefaultRoyalty(event: SetDefaultRoyalty): void {}
+  let from = event.params.from.toHex();
+  let to = event.params.to.toHex();
+  let contract = ERC721.bind(event.address);
 
-export function handleSetMintPrice(event: SetMintPrice): void {}
+  if ((from == ZERO_ADDRESS_STRING) && (to == ZERO_ADDRESS_STRING)) return;
 
-export function handleSetPaused(event: SetPaused): void {}
+  if (from == ZERO_ADDRESS_STRING) {  // MINT 
+    let eip721Token = new Token(id);
 
-export function handleSetTokenPrice(event: SetTokenPrice): void {}
+    let metadataURItried = contract.try_tokenURI(tokenId);
+    if (!metadataURItried.reverted) {
+      eip721Token.tokenURI = normalize(metadataURItried.value);
+    }
 
-export function handleSetTokenRoyalty(event: SetTokenRoyalty): void {}
+    eip721Token.save();
+  } else {
+    if (to == ZERO_ADDRESS_STRING) {  // BURN
+      store.remove('Token', id);
+    } else {                          // TRANSFER
+      let eip721Token = Token.load(id);
 
-export function handleTransfer(event: Transfer): void {}
+      if (eip721Token) {
+        let metadataURIprevious = eip721Token.tokenURI;
+        let metadataURItried = contract.try_tokenURI(tokenId);
+
+        if (!metadataURItried.reverted) {
+          let metadataURInew = normalize(metadataURItried.value);
+
+          if (metadataURInew != metadataURIprevious) {
+            eip721Token.tokenURI = metadataURInew;
+            eip721Token.save();
+          }
+        }
+      }
+    }
+  }
+
+}

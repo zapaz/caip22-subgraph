@@ -1,50 +1,24 @@
-specVersion: 0.0.1
+specVersion: 0.0.4
+description: CAIP22
+repository: https://github.com/zapaz/caip22
 schema:
   file: ./schema.graphql
 dataSources:
-  - kind: ethereum
-    name: OpenNFTs
+  - kind: ethereum/contract
+    name: ERC721
     network: goerli
     source:
-      address: "0xd02A8AA45d624f7Ef8b35AE18FD545854da819e3"
-      abi: OpenNFTs
+      abi: ERC721
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - Approval
-        - ApprovalForAll
-        - OwnershipTransferred
-        - Pay
-        - SetDefaultRoyalty
-        - SetMintPrice
-        - SetPaused
-        - SetTokenPrice
-        - SetTokenRoyalty
-        - Transfer
+        - Token
       abis:
-        - name: OpenNFTs
-          file: ./abis/OpenNFTs.json
+        - name: ERC721
+          file: ./abis/ERC721.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,indexed uint256)
-          handler: handleApproval
-        - event: ApprovalForAll(indexed address,indexed address,bool)
-          handler: handleApprovalForAll
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-        - event: Pay(uint256,uint256,address,uint256,address,uint256,uint256,address,uint256)
-          handler: handlePay
-        - event: SetDefaultRoyalty(address,uint96)
-          handler: handleSetDefaultRoyalty
-        - event: SetMintPrice(uint256)
-          handler: handleSetMintPrice
-        - event: SetPaused(indexed bool,indexed address)
-          handler: handleSetPaused
-        - event: SetTokenPrice(uint256,uint256)
-          handler: handleSetTokenPrice
-        - event: SetTokenRoyalty(uint256,address,uint96)
-          handler: handleSetTokenRoyalty
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
       file: ./src/mapping.ts
