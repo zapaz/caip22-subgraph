@@ -3,7 +3,7 @@ import { Transfer, ERC721 } from '../generated/ERC721/ERC721';
 import { Token } from '../generated/schema';
 
 const ZERO_ADDRESS_STRING = '0x0000000000000000000000000000000000000000';
-const CHAIN_ID = 5;
+const CHAIN_ID = 137;
 
 function setCharAt(str: string, index: i32, char: string): string {
   if (index > str.length - 1) return str;

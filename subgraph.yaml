@@ -6,7 +6,7 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: ERC721
-    network: goerli
+    network: matic
     source:
       abi: ERC721
     mapping:
