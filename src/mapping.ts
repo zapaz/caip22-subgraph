@@ -1,6 +1,7 @@
 import { BigInt, store } from '@graphprotocol/graph-ts';
 import { Transfer, ERC721 } from '../generated/ERC721/ERC721';
 import { Token } from '../generated/schema';
+import { dataSource } from '@graphprotocol/graph-ts'
 
 const ZERO_ADDRESS_STRING = '0x0000000000000000000000000000000000000000';
 const CHAIN_ID = 137;
